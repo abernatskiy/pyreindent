@@ -7,8 +7,8 @@ def stripTrailingNewlines(line):
 		line = line[:-1]
 	return line
 
-def strinTrailingTabsAndSpaces(line):
-	return re.sub(r'[\t ]*$', '', line)
+def stripTrailingTabsAndSpaces(line):
+	return re.sub('[\t ]*$', '', line)
 
 def quoteStatus(origLine, curQuote, substituteWith='__stringLiteral__', replaceCommentsWith='__comment__'):
 	'''Checks whether a line of Python code opens or closes a string literal and
@@ -94,21 +94,23 @@ def bracesStatus(line, curBraces):
 
 def lineWrapped(line):
 	'''Assumes that any trailing spaces or tabs are taken care of'''
-	return False if len(line)<1 else line[-1]=='\\'
+	return False if len(line)==0 else line[-1]=='\\'
 
-def splitIntoBlocks(file):
+def splitIntoBlocks(file, cleanTrailingTabsAndSpaces=False):
 	block = []
 	curBraces = None
 	curQuote = None
 	for line in file:
-#		print(f'{curBraces}, {curQuote}: {line}')
 		line = stripTrailingNewlines(line)
 		block.append(line)
 
 		noslline, curQuote = quoteStatus(line, curQuote)
-#		print(f'{curBraces}, {curQuote}: {noslline}')
+
+		if curQuote is None and cleanTrailingTabsAndSpaces:
+			block[-1] = stripTrailingTabsAndSpaces(block[-1])
+
 		curBraces = bracesStatus(noslline, curBraces)
-		if curQuote or curBraces:
+		if curQuote or curBraces or lineWrapped(noslline):
 			continue
 		else:
 			yield block
@@ -118,18 +120,10 @@ def splitIntoBlocks(file):
 	if curQuote:
 		raise ValueError(f'Infinite block found: the code is syntactically incorrect (remaining quotes {curQuotes})')
 
-
-sourceDir = Path('./generative-query-network-pytorch')
-
-for pyfilename in sourceDir.rglob('*.py'):
-	print(f'================ WORKING ON {pyfilename} ====================')
-	with open(pyfilename, 'r') as pyfile:
-		try:
-			for block in splitIntoBlocks(pyfile):
-				print('\n'.join(block))
-				print('----------------')
-		except ValueError as verr:
-			raise ValueError(f'while processing file {pyfilename}:\n{verr}')
-	print('\n\n\n')
-#	break
-
+def reindentBlock(block, inTabSymbol, outTabSymbol):
+	tabulationLevel = 0
+	firstLine = copy(block[0])
+	while firstLine.find(inTabSymbol)==0:
+		firstLine = firstLine[len(inTabSymbol):]
+		tabulationLevel += 1
+	return [ re.sub('^'+inTabSymbol*tabulationLevel, outTabSymbol*tabulationLevel, line) for line in block ]
