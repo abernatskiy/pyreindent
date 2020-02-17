@@ -3,11 +3,13 @@ from copy import copy
 import re
 
 def stripTrailingNewlines(line):
+	'''If the last character of the argument string is newline, returns it without the newline; otherwise, returns the string unmodified'''
 	if len(line)>0 and line[-1]=='\n':
 		line = line[:-1]
 	return line
 
 def stripTrailingTabsAndSpaces(line):
+	'''Returns its input string with any trailing tabs and spaces removed'''
 	return re.sub('[\t ]*$', '', line)
 
 def quoteStatus(origLine, curQuote, substituteWith='__stringLiteral__', replaceCommentsWith='__comment__'):
@@ -106,7 +108,7 @@ def splitIntoBlocks(file, cleanTrailingTabsAndSpaces=False):
 
 		noslline, curQuote = quoteStatus(line, curQuote)
 
-		if curQuote is None and cleanTrailingTabsAndSpaces:
+		if cleanTrailingTabsAndSpaces and (curQuote is None or _entireBlockIsAMultilineStringLiteral(block)):
 			block[-1] = stripTrailingTabsAndSpaces(block[-1])
 
 		curBraces = bracesStatus(noslline, curBraces)
@@ -120,10 +122,40 @@ def splitIntoBlocks(file, cleanTrailingTabsAndSpaces=False):
 	if curQuote:
 		raise ValueError(f'Infinite block found: the code is syntactically incorrect (remaining quotes {curQuotes})')
 
+def _blockContainsAMultilineStringLiteral(block):
+	curQuote = None
+	for line in block:
+		_, curQuote = quoteStatus(line, curQuote)
+		if curQuote:
+			return True
+	return False
+
+def _entireBlockIsAMultilineStringLiteral(block):
+	'''If it starts with triple quotes, it certainly is'''
+	return re.match('^[\t ]*""".*', block[0]) or re.match("^[\t ]*'''.*", block[0])
+
+def _reindentLine(line, tabulationLevel, inTabSymbol, outTabSymbol):
+	'''Returns the input line with tabulationLevel inTabSymbols in its beginning replaced with the same amount of outTabSymbols'''
+	return re.sub('^'+inTabSymbol*tabulationLevel, outTabSymbol*tabulationLevel, line)
+
+def _reindentBlockContainingAMultilineStringLiteral(block, tabulationLevel, inTabSymbol, outTabSymbol):
+	curQuote = None
+	reindentedBlock = []
+	for line in block:
+		if not curQuote:
+			reindentedBlock.append(_reindentLine(line, tabulationLevel, inTabSymbol, outTabSymbol))
+		else:
+			reindentedBlock.append(line)
+		_, curQuote = quoteStatus(line, curQuote)
+	return reindentedBlock
+
 def reindentBlock(block, inTabSymbol, outTabSymbol):
 	tabulationLevel = 0
 	firstLine = copy(block[0])
 	while firstLine.find(inTabSymbol)==0:
 		firstLine = firstLine[len(inTabSymbol):]
 		tabulationLevel += 1
-	return [ re.sub('^'+inTabSymbol*tabulationLevel, outTabSymbol*tabulationLevel, line) for line in block ]
+	if _blockContainsAMultilineStringLiteral(block) and not _entireBlockIsAMultilineStringLiteral(block):
+		return _reindentBlockContainingAMultilineStringLiteral(block, tabulationLevel, inTabSymbol, outTabSymbol)
+	else:
+		return [ _reindentLine(line, tabulationLevel, inTabSymbol, outTabSymbol) for line in block ]
