@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 
-import pyblocks
+import pylineblocks
 import shutil
 
 def reindentFile(filePath, inTabSymbol, outTabSymbol, cleanTrailingTabsAndSpaces=False, backupPostfix=None, outputOverride=None):
 	newBlocks = []
 	with open(filePath, 'r') as pyfile:
 		try:
-			for block in pyblocks.splitIntoBlocks(pyfile, cleanTrailingTabsAndSpaces=cleanTrailingTabsAndSpaces):
-				newBlocks.append(pyblocks.reindentBlock(block, inTabSymbol, outTabSymbol))
+			for block in pylineblocks.splitIntoBlocks(pyfile, cleanTrailingTabsAndSpaces=cleanTrailingTabsAndSpaces):
+				newBlocks.append(pylineblocks.reindentBlock(block, inTabSymbol, outTabSymbol))
 		except ValueError as verr:
 			raise ValueError(f'while processing file {filePath}:\n{verr}')
 	if not outputOverride and backupPostfix:
