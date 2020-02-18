@@ -1,5 +1,5 @@
 # Test with  
-# $ ./pyreindent.py -rt -f soft4 -t hard -o tests/testReindentOut.py tests/testReindentIn.py
+# $ ./bin/pyreindent.py -rt -f soft4 -t hard -o pylineblocks/tests/testReindentOut.py pylineblocks/tests/testReindentIn.py
 
 def fun1():
     """ a docstring
