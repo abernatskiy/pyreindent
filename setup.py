@@ -4,7 +4,6 @@ setup(
 	name='pyreindent',
 	version='0.1',
 	scripts=['pyreindent.py'],
-	packages=['pylineblocks'],
 	package_data={"": ["*.rst"]},
 	author='Anton Bernatskiy',
 	author_email='abernats@uvm.edu',
