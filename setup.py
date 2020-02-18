@@ -3,11 +3,12 @@ from setuptools import setup
 setup(
 	name='pyreindent',
 	version='0.1',
-	scripts=['pyreindent.py'],
-	package_data={"": ["*.rst"]},
+	scripts=['bin/pyreindent.py'],
+	packages=['pylineblocks'],
 	author='Anton Bernatskiy',
 	author_email='abernats@uvm.edu',
-	description='Freely switch between Python indentation styles',
+	description='Freely switch between various Python indentation styles',
+	long_description='See `project homepage <https://github.com/abernatskiy/pyreindent>`_.',
 	classifiers=[
 	  'Development Status :: 4 - Beta',
 	  'License :: OSI Approved :: MIT License',
@@ -16,5 +17,4 @@ setup(
 	],
 	url='https://github.com/abernatskiy/pyreindent',
 	license='MIT',
-	install_requires=['markdown']
 )
