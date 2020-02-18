@@ -25,18 +25,6 @@ if __name__ == '__main__':
 	# Parsing the arguments
 	parser = argparse.ArgumentParser(description='Freely switch between Python indentation styles')
 
-	parser.add_argument('-q', '--quiet', action='store_true',
-	                    help='Suppress all messages and prompts except for errors')
-	parser.add_argument('-o', '--output', type=str, default=None, metavar='output_file',
-	                    help='Output file name. Default: overwrite the original file(s)')
-	parser.add_argument('-b', '--backup-postfix', type=str, default='~', metavar='postfix',
-	                    help='Back up unmodified input file(s) under their original name(s) with ' \
-	                         'this postfix. Set to empty string to suppress backups. Default: ~')
-	parser.add_argument('-r', '--recursive', action='store_true',
-	                    help='Recursively find all .py files in the input path and convert them')
-	parser.add_argument('-rt', '--remove-trailing', action='store_true',
-	                    help='Remove any trailing tabs or spaces, leaving multiline string literals intact')
-
 	parser.add_argument('input_path', type=str,
 	                    help='Location of the input')
 
@@ -45,6 +33,18 @@ if __name__ == '__main__':
 	                    help='Style of indentation to convert from')
 	req_grp.add_argument('-t', '--to-tabs', choices=['hard', 'soft4', 'soft2'], required=True,
 	                    help='Style of indentation to convert to')
+
+	parser.add_argument('-r', '--recursive', action='store_true',
+	                    help='Recursively find all .py files in the input path and convert them')
+	parser.add_argument('-b', '--backup-postfix', type=str, default='~', metavar='postfix',
+	                    help='Back up unmodified input file(s) under their original name(s) with ' \
+	                         'this postfix. Set to an empty string to suppress backups. Default: ~')
+	parser.add_argument('-rt', '--remove-trailing', action='store_true',
+	                    help='Remove any trailing tabs or spaces, leaving multiline string literals intact')
+	parser.add_argument('-q', '--quiet', action='store_true',
+	                    help='Suppress all messages and prompts except for errors')
+	parser.add_argument('-o', '--output', type=str, default=None, metavar='output_file',
+	                    help='Output file name. Default: overwrite the original file. Note: does not work with the -r option')
 
 	args = parser.parse_args()
 
