@@ -10,6 +10,11 @@ This will display a list of all files that the script has found, a summary of ch
 
 The resulting code should be both consistently formatted and semantically equivalent to the input; if it is not, please submit a bug report. For details see the ''How it works'' section below.
 
+Installation
+------------
+
+	$ pip install pyreindent
+
 Features
 --------
 Help provided by the ``-h`` option lists all the features available:
