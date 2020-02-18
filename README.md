@@ -107,7 +107,7 @@ Trailing tabs and spaces removal works similarly: *pyreindent* will not remove t
 Known limitations
 -----------------
 - Comments or dosctrings that use [string prefixes](https://docs.python.org/3/reference/lexical_analysis.html#grammar-token-stringprefix) will be interpreted as possibly affecting the code execution and their indentation will be kept intact.
-- Sequences of three quotes in which one of the quotes is escaped (e.g. ``\'''``) will be mistaken for a boundary of a string literal. Consequently, an attempt to reindent the following valid Python script
+- Sequences of three quotes in which the first quote is escaped (e.g. ``\'''``) will be mistaken for a boundary of a string literal. Consequently, an attempt to reindent the following valid Python script
 	```python
 	a = '\'''
 	print(a)
